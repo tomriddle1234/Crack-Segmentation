@@ -22,3 +22,8 @@ Intersection over Union (mIoU) despite its simplicity.
 
 The dataset used for Crack Segmentation is DeepCrack, a public dataset of concrete surface cracks.
 EfficientCrackNet achieved 4.44% higher Precision and 0.77& higher mIoU scores over LMM-Net.
+
+## Commands
+### Training
+python main_dev.py --data_dir (data directory) --model_name (name of model to run) --epochs (# of epochs) --alpha (alpha decrease value for Dice Loss) --data_name (name of data to run) --run_num (# of run)
+
