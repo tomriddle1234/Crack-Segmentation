@@ -27,3 +27,5 @@ EfficientCrackNet achieved 4.44% higher Precision and 0.77& higher mIoU scores o
 ### Training
 python main_dev.py --data_dir (data directory) --model_name (name of model to run) --epochs (# of epochs) --alpha (alpha decrease value for Dice Loss) --data_name (name of data to run) --run_num (# of run)
 
+### Evaluation
+python eval.py --data_dir (data directory) --model_name (name of model to run) --data_name (name of data to run) --run_num (# of run)
