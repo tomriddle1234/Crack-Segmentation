@@ -15,13 +15,13 @@ Intersection over Union (mIoU) despite its simplicity.
 **_LMM-Net_** [Paper](https://ieeexplore.ieee.org/document/10539282) <br />
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/cfcc5955-3ea3-4abc-ac28-795a65861f90" width=70% height=70%>
+<img src="https://github.com/user-attachments/assets/cfcc5955-3ea3-4abc-ac28-795a65861f90" width=85% height=85%>
 </div><br />
 
 **_EfficientCrackNet_** [Paper](https://arxiv.org/abs/2409.18099) <br />
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/10b59e5c-5ecf-48bc-98a4-e18dd7686681" width=70% height=70%> 
+<img src="https://github.com/user-attachments/assets/10b59e5c-5ecf-48bc-98a4-e18dd7686681" width=85% height=85%> 
 </div><br />
 
 The dataset used for Crack Segmentation is DeepCrack, a public dataset of concrete surface cracks.
@@ -29,7 +29,11 @@ EfficientCrackNet achieved 4.44% higher Precision and 0.77& higher mIoU scores o
 
 ## Commands
 ### Training
+```python
 python main_dev.py --data_dir (data directory) --model_name (name of model to run) --epochs (# of epochs) --alpha (alpha decrease value for Dice Loss) --data_name (name of data to run) --run_num (# of run)
+```
 
 ### Evaluation
+```python
 python eval.py --data_dir (data directory) --model_name (name of model to run) --data_name (name of data to run) --run_num (# of run)
+```
