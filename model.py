@@ -5,49 +5,60 @@ import numpy as np
 from scipy.ndimage import gaussian_filter, laplace
 
 class UNet_FCN(nn.Module):
-    def __init__(self):
+    def __init__(self, args, scaler=None):
         super().__init__()
-        self.conv1 = nn.Conv2d(6, 64, 3, stride=1, padding=1)
-        self.bn1 = nn.BatchNorm2d(64)
-        self.conv2 = nn.Conv2d(64, 128, 3, stride=1, padding=1)
-        self.bn2 = nn.BatchNorm2d(128)
+        self.conv1 = nn.Conv2d(3, int(32/scaler), 3, stride=1, padding=1)
+        self.bn1 = nn.BatchNorm2d(int(32/scaler))
+        self.conv2 = nn.Conv2d(int(32/scaler), int(64/scaler), 3, stride=1, padding=1)
+        self.bn2 = nn.BatchNorm2d(int(64/scaler))
         self.maxpool = nn.MaxPool2d(2,2)
 
-        self.conv3 = nn.Conv2d(128, 256, 3, stride=1, padding=1)
-        self.bn3 = nn.BatchNorm2d(256)
+        self.conv3 = nn.Conv2d(int(64/scaler), int(128/scaler), 3, stride=1, padding=1)
+        self.bn3 = nn.BatchNorm2d(int(128/scaler))
         # maxpool
-        self.conv4 = nn.Conv2d(256, 256, 3, stride=1, padding=1)
-        self.bn4 = nn.BatchNorm2d(256)
+        self.conv4 = nn.Conv2d(int(128/scaler), int(128/scaler), 3, stride=1, padding=1)
+        self.bn4 = nn.BatchNorm2d(int(128/scaler))
         # maxpool
-        self.conv5 = nn.Conv2d(256, 512, 3, stride=1, padding=1)
-        self.bn5 = nn.BatchNorm2d(512)
-        self.conv6 = nn.Conv2d(512, 512, 3, stride=1, padding=1)
-        self.bn6 = nn.BatchNorm2d(512)
+        self.conv5 = nn.Conv2d(int(128/scaler), int(256/scaler), 3, stride=1, padding=1)
+        self.bn5 = nn.BatchNorm2d(int(256/scaler))
+        self.conv6 = nn.Conv2d(int(256/scaler), int(256/scaler), 3, stride=1, padding=1)
+        self.bn6 = nn.BatchNorm2d(int(256/scaler))
 
-        self.conv7 = nn.Conv2d(512, 1024, 3, stride=1, padding=1)
-        self.bn7 = nn.BatchNorm2d(1024)
-        self.conv8 = nn.Conv2d(1024, 1024, 3, stride=1, padding=1)
-        self.bn8 = nn.BatchNorm2d(1024)
-        self.transconv1 = nn.ConvTranspose2d(1024, 512, 2, stride=2)
+        self.conv7 = nn.Conv2d(int(256/scaler), int(512/scaler), 3, stride=1, padding=1)
+        self.bn7 = nn.BatchNorm2d(int(512/scaler))
+        self.conv8 = nn.Conv2d(int(512/scaler), int(512/scaler), 3, stride=1, padding=1)
+        self.bn8 = nn.BatchNorm2d(int(512/scaler))
 
-        self.conv9 = nn.Conv2d(1024, 512, 3, stride=1, padding=1)
-        self.bn9 = nn.BatchNorm2d(512)
-        self.conv10 = nn.Conv2d(512, 512, 3, stride=1, padding=1)
-        self.bn10 = nn.BatchNorm2d(512)
-        self.transconv2 = nn.ConvTranspose2d(512, 256, 2, stride=2)
+        self.conv9 = nn.Conv2d(int(512/scaler), int(512/scaler), 3, stride=1, padding=1)
+        self.bn9 = nn.BatchNorm2d(int(512/scaler))
+        self.conv10 = nn.Conv2d(int(512/scaler), int(1024/scaler), 3, stride=1, padding=1)
+        self.bn10 = nn.BatchNorm2d(int(1024/scaler))
 
-        self.conv11 = nn.Conv2d(512, 256, 3, stride=1, padding=1)
-        self.bn11 = nn.BatchNorm2d(256)
-        self.conv12 = nn.Conv2d(256, 256, 3, stride=1, padding=1)
-        self.bn12 = nn.BatchNorm2d(256)
-        self.transconv3 = nn.ConvTranspose2d(256, 128, 2, stride=2)
+        self.transconv1 = nn.ConvTranspose2d(int(1024/scaler), int(512/scaler), 2, stride=2)
+        self.conv11 = nn.Conv2d(int(1024/scaler), int(512/scaler), 3, stride=1, padding=1)
+        self.bn11 = nn.BatchNorm2d(int(512/scaler))
+        self.conv12 = nn.Conv2d(int(512/scaler), int(256/scaler), 3, stride=1, padding=1)
+        self.bn12 = nn.BatchNorm2d(int(256/scaler))
 
-        self.conv13 = nn.Conv2d(256, 128, 3, stride=1, padding=1)
-        self.bn13 = nn.BatchNorm2d(128)
-        self.conv14 = nn.Conv2d(128, 64, 3, stride=1, padding=1)
-        self.bn14 = nn.BatchNorm2d(64)
+        self.transconv2 = nn.ConvTranspose2d(int(256/scaler), int(256/scaler), 2, stride=2)
+        self.conv13 = nn.Conv2d(int(512/scaler), int(256/scaler), 3, stride=1, padding=1)
+        self.bn13 = nn.BatchNorm2d(int(256/scaler))
+        self.conv14 = nn.Conv2d(int(256/scaler), int(128/scaler), 3, stride=1, padding=1)
+        self.bn14 = nn.BatchNorm2d(int(128/scaler))
 
-        self.conv15 = nn.Conv2d(64, 1, 1, stride=1, padding=0)
+        self.transconv3 = nn.ConvTranspose2d(int(128/scaler), int(128/scaler), 2, stride=2)
+        self.conv15 = nn.Conv2d(int(256/scaler), int(128/scaler), 3, stride=1, padding=1)
+        self.bn15 = nn.BatchNorm2d(int(128/scaler))
+        self.conv16 = nn.Conv2d(int(128/scaler), int(64/scaler), 3, stride=1, padding=1)
+        self.bn16 = nn.BatchNorm2d(int(64/scaler))
+
+        self.transconv4 = nn.ConvTranspose2d(int(64/scaler), int(64/scaler), 2, stride=2)
+        self.conv17 = nn.Conv2d(int(128/scaler), int(64/scaler), 3, stride=1, padding=1)
+        self.bn17 = nn.BatchNorm2d(int(64/scaler))
+        self.conv18 = nn.Conv2d(int(64/scaler), int(64/scaler), 3, stride=1, padding=1)
+        self.bn18 = nn.BatchNorm2d(int(64/scaler))
+        self.conv19 = nn.Conv2d(int(64/scaler), 1, 1, stride=1, padding=0)
+
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
@@ -61,28 +72,36 @@ class UNet_FCN(nn.Module):
 
         x3 = F.relu(self.bn5(self.conv5(l5)))
         x3 = F.relu(self.bn6(self.conv6(x3)))
-        l11 = self.maxpool(x3)
+        l7 = self.maxpool(x3)
         
-        x4 = F.relu(self.bn7(self.conv7(l11)))
+        x4 = F.relu(self.bn7(self.conv7(l7)))
         x4 = F.relu(self.bn8(self.conv8(x4)))  
+        l9 = self.maxpool(x4)
 
-        trans_x1 = self.transconv1(x4)
-        trans_x1 = torch.cat((trans_x1, x3), 1)
-        trans_x1 = F.relu(self.bn9(self.conv9(trans_x1)))
-        trans_x1 = F.relu(self.bn10(self.conv10(trans_x1)))
+        x5 = F.relu(self.bn9(self.conv9(l9)))
+        x5 = F.relu(self.bn10(self.conv10(x5)))  
+
+        trans_x1 = self.transconv1(x5)
+        trans_x1 = torch.cat((trans_x1, x4), 1)
+        trans_x1 = F.relu(self.bn11(self.conv11(trans_x1)))
+        trans_x1 = F.relu(self.bn12(self.conv12(trans_x1)))
 
         trans_x2 = self.transconv2(trans_x1)
-        trans_x2 = torch.cat((trans_x2, x2), 1)
-        trans_x2 = F.relu(self.bn11(self.conv11(trans_x2)))
-        trans_x2 = F.relu(self.bn12(self.conv12(trans_x2)))
+        trans_x2 = torch.cat((trans_x2, x3), 1)
+        trans_x2 = F.relu(self.bn13(self.conv13(trans_x2)))
+        trans_x2 = F.relu(self.bn14(self.conv14(trans_x2)))
 
         trans_x3 = self.transconv3(trans_x2)
-        trans_x3 = torch.cat((trans_x3, x1), 1)
+        trans_x3 = torch.cat((trans_x3, x2), 1)
+        trans_x3 = F.relu(self.bn15(self.conv15(trans_x3)))
+        trans_x3 = F.relu(self.bn16(self.conv16(trans_x3)))
 
-        prefinal_x = F.relu(self.bn13(self.conv13(trans_x3)))
-        prefinal_x = F.relu(self.bn14(self.conv14(prefinal_x)))
+        trans_x4 = self.transconv4(trans_x3)
+        trans_x4 = torch.cat((trans_x4, x1), 1)
+        trans_x4 = F.relu(self.bn17(self.conv17(trans_x4)))
+        trans_x4 = F.relu(self.bn18(self.conv18(trans_x4)))
 
-        final_x = self.sigmoid(self.conv15(prefinal_x))
+        final_x = self.sigmoid(self.conv19(trans_x4))
 
         return final_x
     
@@ -452,3 +471,17 @@ class LMM_Net(nn.Module):
 
         return self.lastlayer(x+x1)
     
+# MobileViT Block
+# https://github.com/xmu-xiaoma666/External-Attention-pytorch?tab=readme-ov-file#28-MobileViT-Attention-Usage
+
+# ULSAM
+# https://github.com/Nandan91/ULSAM
+
+# class EfficientCrackNet(nn.Module):
+#     def __init__(self, img_ch=3, output_ch=1):
+#         super(EfficientCrackNet, self).__init__()
+#         self.DSC = 
+#         self.EEM = EEM(ch_in1, EEM_ch_out, kernel=3, groups=ch_in1, reduction=reduction[0])
+        
+#     def forward(self, x):
+#         pass 
