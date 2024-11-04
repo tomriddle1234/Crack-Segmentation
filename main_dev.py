@@ -20,7 +20,7 @@ print(torch.cuda.is_available())
 warnings.filterwarnings("ignore")
 
 
-def run_with_validation(args, model, train_dataloaders, valid_dataloaders, optimizer, plot_path):
+def run_with_validation(args, model, train_dataloaders, valid_dataloaders, plot_path):
 
     # Training loop
     epochs = []                
@@ -31,21 +31,25 @@ def run_with_validation(args, model, train_dataloaders, valid_dataloaders, optim
     bce_loss = BCELoss()
     dice_loss = DiceLoss()
     miou_loss = IoULoss()
+
+    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.optim_w_decay)
+    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=args.lr_decay, patience=args.num_epochs_decay, verbose=True)
     print('------------  Training started! --------------')
     num_epochs = args.epochs
+    alpha = args.alpha
     for epoch in tqdm(range(num_epochs)):
         model.train()
 
         b_train_loss = []
-        b_train_y = []
-        b_train_y_hat = []
+        if epoch % 20 == 0:
+            alpha -= 0.2
         for i, (inputs, masks) in enumerate(train_dataloaders):
             inputs, masks = inputs.to(device), masks.to(device)
             
             optimizer.zero_grad()    
             outputs = model(inputs)
 
-            loss = bce_loss(outputs, masks.to(device)) + (dice_loss(outputs, masks.to(device)) + miou_loss(outputs, masks.to(device)))
+            loss = bce_loss(outputs, masks.to(device)) + (alpha * (dice_loss(outputs, masks.to(device)) + miou_loss(outputs, masks.to(device))))
             b_train_loss.append(loss.item())
 
             del inputs
@@ -57,6 +61,7 @@ def run_with_validation(args, model, train_dataloaders, valid_dataloaders, optim
             optimizer.step()
         
         epoch_train_loss.append(np.mean(b_train_loss))
+        lr_scheduler.step(np.mean(b_train_loss))
         print('Epoch: {}'.format(epoch+1))
         print('Training Loss: {}'.format(np.mean(b_train_loss)))
 
@@ -64,13 +69,11 @@ def run_with_validation(args, model, train_dataloaders, valid_dataloaders, optim
 
         with torch.no_grad():
             b_valid_loss = []
-            b_valid_y = []
-            b_valid_y_hat = []
             for i, (inputs, masks) in enumerate(valid_dataloaders):
                 inputs = inputs.to(device)
                 outputs = model(inputs)
 
-                val_loss = bce_loss(outputs, masks.to(device)) + (dice_loss(outputs, masks.to(device)) + miou_loss(outputs, masks.to(device)))
+                val_loss = bce_loss(outputs, masks.to(device))
                 b_valid_loss.append(val_loss.item())
 
             print('Validation Loss {}'.format(np.mean(b_valid_loss)))
@@ -104,17 +107,13 @@ def run_without_validation(args, model, train_dataloaders, plot_path):
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=args.lr_decay, patience=args.num_epochs_decay, verbose=True)
 
     print('------------  Training started! --------------')
-    print('Model getting trained is:', args.model_name)
-    print('Data getting fed is:', args.data_name)
-    print('Value of alpha is:', args.alpha)
+
     num_epochs = args.epochs
     alpha = args.alpha
     for epoch in tqdm(range(num_epochs)):
         model.train()
 
         b_train_loss = []
-        b_train_y = []
-        b_train_y_hat = []
         if epoch % 60 == 0:
             alpha -= 0.2
 
@@ -166,7 +165,6 @@ if __name__ == '__main__':
     parser.add_argument('--run_num', type=str, help='run number')
     parser.add_argument('--half', type=bool, default=False, help='use half Model size or not')
     parser.add_argument('--augment', type=bool, default=False, help='whether augment dataset or not')
-
     args = parser.parse_args()
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -183,7 +181,7 @@ if __name__ == '__main__':
         print(f"The file {plot_path} and {model_path} and {tensorboard_path} already exist.")
     
     if args.model_name == 'UNet':
-        model = UNet_FCN(args = args).to(device)
+        model = UNet_FCN(args = args, scaler=2).to(device)
         model.apply(init_weights)
     elif args.model_name == 'LMM_Net':
         model = LMM_Net().to(device)
@@ -193,7 +191,9 @@ if __name__ == '__main__':
     if args.data_name == 'deepcrack':
         train_dataset = DeepCrackDataset(args, data_part='train')
         train_dataloaders = DataLoader(train_dataset, batch_size=8, num_workers=10)
-        valid_dataloaders = None
+        
+        valid_dataset = DeepCrackDataset(args, data_part='valid')
+        valid_dataloaders = DataLoader(valid_dataset, batch_size=8, num_workers=10)
 
     # Move the model to the GPU if available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -204,5 +204,4 @@ if __name__ == '__main__':
     else:
         run_without_validation(args, model, train_dataloaders, plot_path)
 
-
-# python main_dev.py --data_dir C:/Users/jwkor/Documents/UNM/crack_segmentation/dataset/DeepCrack/ --model_name EfficientCrackNet --epochs 180 --alpha 0.8 --data_name deepcrack --run_num 1
+# python main_dev.py --data_dir C:/Users/jwkor/Documents/UNM/crack_segmentation/dataset/DeepCrack/ --validate True --model_name UNet --epochs 50 --alpha 0.8 --data_name deepcrack --run_num 1
