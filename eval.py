@@ -18,11 +18,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-# could consider normalizing the images
-# transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-# reference: https://github.com/yhlleo/DeepSegmentor/blob/master/data/deepcrack_dataset.py
-
-
 # Testing model
 def eval(args, test_dataloaders):
     
@@ -77,7 +72,7 @@ def eval(args, test_dataloaders):
     print(f'Test mIoU Score is: {round(test_miou_score, 2)}')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Time Series forecasting of device data')
+    parser = argparse.ArgumentParser(description='Crack Segmentation Work')
     parser.add_argument('--data_dir', type=str, help='Main directory of input dataset')
     parser.add_argument('--batch_size', type=int, default=8, help='batch size')
     parser.add_argument('--learning_rate', type=float, default=0.001,help='learning rate')
@@ -105,6 +100,3 @@ if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     eval(args, test_dataloaders)
 
-
-
-# python eval.py --data_dir C:/Users/jwkor/Documents/UNM/crack_segmentation/dataset/DeepCrack/ --model_name UNet --data_name deepcrack --run_num 1
