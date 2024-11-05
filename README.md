@@ -7,10 +7,17 @@ In this case, semantic segmentation was executed for Crack Segmentation, which i
 for assessment of Structural Health and its Monitoring. It can also server to measure the width
 and length of the crack for even further assessment of the structural health.
 
-A light-weight yet effective model named EfficientCrackNet was developed and implemented. This is
+A benchmark study of multiple State-of-the-Art and latest DL models for Crack Segmentation is conducted.
+In particular, a light-weight yet effective model named EfficientCrackNet was developed and implemented. This is
 a very recent model that was developed after LMM-Net, another model that was developed for the same
 purpose. EfficientCrackNet outperforms LMM-Net in various metrics including Precision and mean 
 Intersection over Union (mIoU) despite its simplicity. 
+
+**_U-Net_** [Paper](https://arxiv.org/abs/1505.04597) <br />
+
+<div align="center">
+<img src="https://github.com/user-attachments/assets/6c3a0a9a-add5-4410-bbef-18acf811c41e" width=85% height=85%>
+</div><br />
 
 **_LMM-Net_** [Paper](https://ieeexplore.ieee.org/document/10539282) <br />
 
