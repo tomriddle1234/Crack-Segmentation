@@ -2,9 +2,9 @@
 
 Semantic Segmentation is an essential task in Computer Vision, which has to do with
 segmenting the objects of certain categories within a given frame. This task can be applied to
-undertaker other tasks such as, Autonomous Vehicles, Medical Diagnosis, Farming, etc. 
+undertake other tasks such as, Autonomous Vehicles, Medical Diagnosis, Farming, etc. 
 In this case, semantic segmentation was executed for Crack Segmentation, which is critical
-for assessment of Structural Health and its Monitoring. It can also server to measure the width
+for the assessment of Structural Health and its Monitoring. It can also serve to measure the width
 and length of the crack for even further assessment of the structural health.
 
 A benchmark study of multiple State-of-the-Art and latest DL models for Crack Segmentation is conducted.
