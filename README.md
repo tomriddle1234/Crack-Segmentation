@@ -46,7 +46,7 @@ python eval.py --data_dir (data directory) --model_name (name of model to run) -
 ```
 ### Metric Scores 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/23bf1804-6c0c-47d1-8ba8-785df2eb0832" width=85% height=85%> 
+<img src="https://github.com/user-attachments/assets/c84f4211-4800-4f8f-b671-cd7c74675feb" width=85% height=85%> 
 </div><br />
 
 ### Sample Segmented Test Images of each Model
