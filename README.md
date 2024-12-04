@@ -44,3 +44,12 @@ python main_dev.py --data_dir (data directory) --model_name (name of model to ru
 ```python
 python eval.py --data_dir (data directory) --model_name (name of model to run) --data_name (name of data to run) --run_num (# of run)
 ```
+### Metric Scores 
+<div align="center">
+<img src="https://github.com/user-attachments/assets/23bf1804-6c0c-47d1-8ba8-785df2eb0832" width=85% height=85%> 
+</div><br />
+
+### Sample Segmented Test Images of each Model
+<div align="center">
+<img src="https://github.com/user-attachments/assets/b372f626-e98b-4466-943c-fc888dcb783a" width=85% height=85%> 
+</div><br />
