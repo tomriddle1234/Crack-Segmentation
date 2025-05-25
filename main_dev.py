@@ -33,7 +33,7 @@ def run_with_validation(args, model, train_dataloaders, valid_dataloaders, plot_
     miou_loss = IoULoss()
 
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.optim_w_decay)
-    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=args.lr_decay, patience=args.num_epochs_decay, verbose=True)
+    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=args.lr_decay, patience=args.num_epochs_decay)
     print('------------  Training started! --------------')
     num_epochs = args.epochs
     alpha = args.alpha
@@ -104,7 +104,7 @@ def run_without_validation(args, model, train_dataloaders, plot_path):
 
     # if args.model_name == 'LMM_Net':
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.optim_w_decay)
-    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=args.lr_decay, patience=args.num_epochs_decay, verbose=True)
+    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=args.lr_decay, patience=args.num_epochs_decay)
 
     print('------------  Training started! --------------')
 
@@ -172,6 +172,12 @@ if __name__ == '__main__':
     plot_path= f'./plots/{args.model_name}/run_{args.run_num}/'
     model_path= f'./saved_models/{args.model_name}/run_{args.run_num}/'
     tensorboard_path = f'./tensorboard/{args.model_name}/run_{args.run_num}/'
+
+    os.makedirs(f'./plots/{args.model_name}/run_{args.run_num}/', exist_ok=True)
+    os.makedirs(f'./saved_models/{args.model_name}/run_{args.run_num}/', exist_ok=True)
+    os.makedirs(f'./tensorboard/{args.model_name}/run_{args.run_num}/', exist_ok=True)
+
+
     writer = SummaryWriter(tensorboard_path)
     if not os.path.exists(path=plot_path) and not os.path.exists(path=model_path) and not os.path.exists(path=tensorboard_path):
         os.mkdir(plot_path) 
@@ -192,7 +198,7 @@ if __name__ == '__main__':
         train_dataset = DeepCrackDataset(args, data_part='train')
         train_dataloaders = DataLoader(train_dataset, batch_size=8, num_workers=10)
         
-        valid_dataset = DeepCrackDataset(args, data_part='valid')
+        valid_dataset = DeepCrackDataset(args, data_part='test') # changed this into test
         valid_dataloaders = DataLoader(valid_dataset, batch_size=8, num_workers=10)
 
     # Move the model to the GPU if available
@@ -205,3 +211,5 @@ if __name__ == '__main__':
         run_without_validation(args, model, train_dataloaders, plot_path)
 
 # python main_dev.py --data_dir C:/Users/jwkor/Documents/UNM/crack_segmentation/dataset/DeepCrack/ --validate True --model_name UNet --epochs 50 --alpha 0.8 --data_name deepcrack --run_num 1
+
+# python main_dev.py --data_dir C:/src/DeepCrack/dataset/ --validate True --model_name EfficientCrackNet --epochs 50 --alpha 0.8 --data_name deepcrack --run_num 1

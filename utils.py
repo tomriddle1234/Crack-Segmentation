@@ -52,18 +52,25 @@ class DeepCrackDataset(Dataset):
         self.augmentation_prob = 0.5
         self.args = args
         # gives list of entire path to each image along the img_dir
+        #print("Current dataset path:", self.args.data_dir)
         if self.data_part == 'train':
             self.image_path_list = sorted(glob.glob(os.path.join(self.args.data_dir, "train_img/*.jpg"))) 
             self.mask_path_list = sorted(glob.glob(os.path.join(self.args.data_dir, "train_lab/*.png")))
         elif self.data_part == 'test':
             self.image_path_list = sorted(glob.glob(os.path.join(self.args.data_dir, "test_img/*.jpg"))) 
             self.mask_path_list = sorted(glob.glob(os.path.join(self.args.data_dir, "test_lab/*.png")))
+
+        #print("Loaded images path:", self.image_path_list)
         
     def __len__(self):
         return len(self.image_path_list)
 
     def __getitem__(self, idx):
         # TODO
+        image_width = 0
+        image_height = 0
+        mask_width = 0
+        mask_height = 0
         image = Image.open(self.image_path_list[idx])
         mask = Image.open(self.mask_path_list[idx])
 
@@ -132,6 +139,8 @@ def save_training_plot_only(epoch_train_loss, epochs, args):
     train_loss_plot, = plt.plot(epochs, epoch_train_loss, 'r')
     plt.title('Training Loss')
     plt.legend([train_loss_plot], ['Training Loss'])
+
+    os.makedirs(f'./plots/{args.model_name}/run_{args.run_num}/', exist_ok=True)
     plt.savefig(f'./plots/{args.model_name}/run_{args.run_num}/loss_plots.jpg')
 
 
@@ -144,6 +153,7 @@ def save_plots(epoch_train_loss, epoch_valid_loss, epochs, args):
     val_loss_plot, = plt.plot(epochs, epoch_valid_loss, 'b')
     plt.title('Training and Validation Loss')
     plt.legend([train_loss_plot, val_loss_plot], ['Training Loss', 'Validation Loss'])
+    os.makedirs(f'./plots/{args.model_name}/run_{args.run_num}/', exist_ok=True)
     plt.savefig(f'./plots/{args.model_name}/run_{args.run_num}/loss_plots.jpg')
 
 

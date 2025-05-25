@@ -16,7 +16,7 @@ from torch.utils.data import TensorDataset, DataLoader
 print(torch.cuda.is_available())
 import warnings
 warnings.filterwarnings("ignore")
-
+from PIL import Image
 
 # Testing model
 def eval(args, test_dataloaders):
@@ -43,6 +43,16 @@ def eval(args, test_dataloaders):
             output_mask= model(input_img)
             output_mask[output_mask > 0.5] = 1.
             output_mask[output_mask < 0.5] = 0.
+
+            # there's a specific python file sample_img_extracion.py can save results
+            # # Save output_mask as image
+            # for i in range(output_mask.size(0)):  # Iterate through batch size
+            #     output_mask_image = output_mask[i].cpu().numpy().astype(np.uint8) * 255  # Convert to 0-255 scale
+            #     output_mask_image = Image.fromarray(output_mask_image)  # Convert to PIL image
+            #
+            #     # Save image with a unique name
+            #     image_name = f"{args.model_name}_run_{args.run_num}_batch_{idx}_img_{i}.png"
+            #     output_mask_image.save(os.path.join(output_dir, image_name))
 
             f1_s = f1_score(mask.cpu().numpy().flatten(), output_mask.cpu().numpy().flatten())
             recall = recall_score(mask.cpu().numpy().flatten(), output_mask.cpu().numpy().flatten())
